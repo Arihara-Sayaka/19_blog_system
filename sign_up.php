@@ -32,25 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   if ($user) {
     $errors[] = '既にメールアドレスが登録されています';
   }
+
+  if (empty($errors)) {
+    $sql = "insert into users " . 
+    "(email, name, password, created_at, updated_at) values" . 
+    "(:email, :name, :password, now(), now())";
+
+    $stmt = $dbh->prepare($sql);
+    $stmt->bindParam(":email", $email);
+    $stmt->bindParam(":name", $name);
+    $pw_hash = password_hash($password, PASSWORD_DEFAULT);
+    $stmt->bindParam(":password", $pw_hash);
+    $stmt->execute();
+
+    header('Location: sign_in.php');
+    exit;
+
+  }
 }
-
-if (empty($errors)) {
-  $sql = "insert into users " . 
-  "(email, name, password, created_at, updated_at) values" . 
-  "(:email, :name, :password, now(), now())";
-
-  $stmt = $dbh->prepare($sql);
-  $stmt->bindParam(":email", $email);
-  $stmt->bindParam(":name", $name);
-  $pw_hash = password_hash($password, PASSWORD_DEFAULT);
-  $stmt->bindParam(":password", $pw_hash);
-  $stmt->execute();
-
-  header('Location: sign_in.php');
-  exit;
-
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -71,6 +70,25 @@ if (empty($errors)) {
   <div class="flex-col-area">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
       <a href="http://localhost/19_blog_system/index.php" class="navbar-brand">Camp Blog</a>
+            <div class="collapse navbar-collapse" id="navberToggler">
+        <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+          <?php if ($_SESSION['id']) : ?>
+          <li class="nav-item">
+            <a href="sign_out.php" class="nav-link">ログアウト</a>
+          </li>
+          <li class="nav-item">
+            <a href="nwe.php" class="nav-link">New Post</a>
+          </li>
+          <?php else : ?>
+          <li class="nav-item">
+            <a href="sign_in.php" class="nav-link">ログイン</a>
+          </li>
+          <li class="nav-item">
+            <a href="sign_up.php" class="nav-link">アカウント登録</a>
+          </li>
+          <?php endif; ?>
+        </ul>
+      </div>
     </nav>
     <div class="container">
       <div class="row">
