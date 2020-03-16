@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a href="sign_out.php" class="nav-link">ログアウト</a>
           </li>
           <li class="nav-item">
-            <a href="nwe.php" class="nav-link">New Post</a>
+            <a href="new.php" class="nav-link">New Post</a>
           </li>
           <?php else : ?>
           <li class="nav-item">
