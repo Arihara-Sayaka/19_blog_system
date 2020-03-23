@@ -20,14 +20,31 @@ on p.category_id = c.id
 left join
   users u
 on p.user_id = u.id
-order by
-  p.created_at desc
 SQL;
+
+if (isset($_GET['category_id']) && is_numeric($_GET['category_
+_id'])) {
+  $category_id = $_GET['category_id'];
+  $sql_where = " where p.category_id = :category_id";
+} else {
+  $sql_where = "";
+}
+
+$sql_order = " order by p.created_at desc";
+
+$sql = $sql . $sql_where . $sql_order;
+
 $stmt = $dbh->prepare($sql);
+if ($category_id) {
+  $stmt->bindParam(":catewgory_id", $category_id, PDO::PARAM_INT);
+}
 $stmt->execute();
 $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
+$sql = "select id, name from categories order by id";
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -69,7 +86,7 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </nav>
     <div class="container">
       <div class="row">
-        <div class="col-sm-11 col-md-10 col-lg-9 mx-auto">
+        <div class="col-md-8">
           <div class="row">
             <?php foreach ($posts as $post) : ?>
               <div class="col-md-6">
@@ -83,6 +100,16 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
               </div>
             <?php endforeach; ?>
           </div>
+        </div>
+        <div class="col-md-4">
+          <h2 class="blog-heading">カテゴリー</h2>
+          <ul class="category-list clearfix">
+            <?php foreach ($categories as $c) : ?>
+              <li class="category">
+                <a href="index.php?category_id=<?php echo h($c['id']); ?>"><?php echo h($c['name']); ?></a>
+              </li>
+            <?php endforeach; ?>
+          </ul>
         </div>
       </div>
     </div>
